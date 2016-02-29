@@ -1,0 +1,4 @@
+# common
+新浪频道运营常用组件
+1、cssPreloader,首页进入后预加载之后也页面静态资源 提高下个页面响应速度
+2、cssPreloadWithGulp 利用gulp打包工具对preLoader资源进行路径替换
