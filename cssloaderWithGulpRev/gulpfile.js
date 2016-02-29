@@ -1,7 +1,10 @@
 var gulp = require('gulp');
 var rev = require('gulp-rev');
-var path='dev/'
+var path='build/html/'
 var clean = require('gulp-clean');
+
+var gulpCopy = require('gulp-file-copy');
+
 
 
 var fs=require("fs");  
@@ -11,8 +14,10 @@ function compileFile(json){
         if(/\.*\.html/.test(item)){
          var content = fs.readFileSync(path+item,"utf-8") 
          content = replaceContent(content,json) //替换内部preload的资源地址
-         fs.writeFile(path+item,content)
-        }
+        
+           fs.writeFileSync(path+item,content,"utf-8")
+
+          }   
      })
  })
 }
@@ -37,19 +42,26 @@ function replaceContent(content,json){
 }
  
 gulp.task('clean', function () {
-	return gulp.src('build/css/*.css', {read: false})
-		.pipe(clean());
+     return gulp.src('build/', {read: false})
+    .pipe(clean());
 });
 
-gulp.task('build', function () {
+gulp.task('copy',['clean'],function(){
+        return gulp.src('dev/html/*.html')
+         .pipe(gulp.dest('build/html/'))
+
+})
+
+gulp.task('build',['copy'], function () {
     // by default, gulp would pick `assets/css` as the base,
     // so we need to set it explicitly:
-    return gulp.src(['dev/css/*.css', 'dev/js/*.js'], {base: 'dev/css'})
+   return  gulp.src(['dev/css/*.css', 'dev/js/*.js'], {base: 'dev/css'})
         .pipe(gulp.dest('build/css/'))  // copy original assets to build dir
         .pipe(rev())
         .pipe(gulp.dest('build/css/'))  // write rev'd assets to build dir
         .pipe(rev.manifest())
         .pipe(gulp.dest('build/css/')); // write manifest to build dir
+ 
 });
 
 gulp.task('preload',function(){
@@ -57,6 +69,9 @@ gulp.task('preload',function(){
 	 var data = fs.readFileSync("build/css/rev-manifest.json","utf-8") 
 	 data = JSON.parse(data)
      compileFile(data)
+     console.log('preload success')
 })
 
-gulp.task('default',['clean','build','preload'])
+gulp.task('default',['clean','copy','build'],function(){
+   gulp.run('preload')
+})
