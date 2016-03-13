@@ -47,26 +47,25 @@ gulp.task('clean', function () {
 });
 
 gulp.task('copy',['clean'],function(){
-        return gulp.src('dev/html/*.html')
-         .pipe(gulp.dest('build/html/'))
+        return gulp.src(['dev/**/'])
+         .pipe(gulp.dest('build/'))
 
 })
 
 gulp.task('build',['copy'], function () {
     // by default, gulp would pick `assets/css` as the base,
     // so we need to set it explicitly:
-   return  gulp.src(['dev/css/*.css', 'dev/js/*.js'], {base: 'dev/css'})
-        .pipe(gulp.dest('build/css/'))  // copy original assets to build dir
+   return  gulp.src(['build/**/*.css', 'build/**/*.js'])
         .pipe(rev())
-        .pipe(gulp.dest('build/css/'))  // write rev'd assets to build dir
+        .pipe(gulp.dest('build/'))  // write rev'd assets to build dir
         .pipe(rev.manifest())
-        .pipe(gulp.dest('build/css/')); // write manifest to build dir
+        .pipe(gulp.dest('build/')); // write manifest to build dir
  
 });
 
 gulp.task('preload',function(){
 	 var json 
-	 var data = fs.readFileSync("build/css/rev-manifest.json","utf-8") 
+	 var data = fs.readFileSync("build/rev-manifest.json","utf-8") 
 	 data = JSON.parse(data)
      compileFile(data)
      console.log('preload success')
